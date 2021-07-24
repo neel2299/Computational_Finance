@@ -1,0 +1,68 @@
+```{r}
+library(tseries)
+library(zoo)
+library(reticulate)
+
+```
+
+
+
+```{r}
+FTSE<-EuStockMarkets[,"FTSE"]
+asset<-FTSE
+n<-length(asset)
+sim.size<-500
+rt<-diff(log(asset))
+rbar<-mean(rt)
+s<-sd(rt)
+delta_t<-1
+set.seed(321)
+mu_hat<-rbar+s^2/2
+
+rt.sim<-rnorm(sim.size,mean=(rbar),sd=s)
+asset.sim<-rep(NA,sim.size)
+asset.sim[1]<-asset[n]*exp(rt.sim[1])
+for(i in 2:sim.size){
+  asset.sim[i]<-asset.sim[i-1]*exp(rt.sim[i])
+}
+yl<-min(asset)*0.9
+yh<-max(asset)*1.9
+plot(ts(asset),xlim=c(0,(n+sim.size)),ylim=c(yl,yh))
+lines((n+1):(n+sim.size),asset.sim,col="magenta",lwd=2)
+##asset.sim
+plot(ts(rt))
+```
+
+
+
+
+```{r}
+d <- density(rt)
+plot(d)
+```
+
+
+
+
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+```
+
+
+```{r}
+RT<-data.frame(Y=as.matrix(rt), date=time(rt))
+```
+
+
+
+```{python}
+RT.plot.hist(bins = 60)
+plt.show()
+```
+
+
+

@@ -1,0 +1,59 @@
+```{r}
+ind_val<-as.matrix(EuStockMarkets)
+r<-diff(log(ind_val))*100
+port_lim<-10000
+set.seed(1)
+sigma<-mu<-rep(NA,port_lim)
+for(i in 1:port_lim){
+  w<-sample(1:1000, 4, replace=TRUE)
+  w<-w/sum(w)
+  rp<-r%*%w
+  mu[i]=mean(rp)
+  sigma[i]<-sd(rp)
+  
+}
+plot(sigma,mu)
+
+```
+
+
+
+
+
+```{r}
+library(corrplot)
+sigma2<-cor(r)
+sigma2
+
+head(EuStockMarkets)
+
+x<-which(sigma2 == max(sigma2), arr.ind = TRUE)
+x=sigma2[3,3]
+sigma2<-as.vector(sigma2)
+x
+sigma2<-sigma2/x
+
+sigma2<-matrix(sigma2,nrow=4)
+
+corrplot(sigma2)
+
+```
+```{r}
+Sigma<-cov(r)
+library(tseries)
+er<-seq(0.045,0.075,0.001)
+frontier<-matrix(NA,nrow=length(er),ncol=2)
+for (i in 1:length(er)){
+  port_opt<-portfolio.optim(r,pm=er[i],covmat=Sigma)#calculates st no other pf has the same mean and a lower volatility.
+  frontier[i,]<-c(port_opt$ps,port_opt$pm)
+}
+plot(sigma,mu)
+lines(frontier,col="magenta")
+
+
+```
+```{r}
+data<-as.data.frame.matrix(EuStockMarkets)
+data
+```
+
